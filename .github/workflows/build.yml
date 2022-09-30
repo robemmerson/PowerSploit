@@ -34,7 +34,8 @@ jobs:
           sed -i -e 's/ArgumentPtr/PullLemons/g' $mimi
           sed -i -e 's/CallDllMainSC1/EggHunter/g' $mimi
           sed -i -e "s/\-Win32Functions \$Win32Functions$/\-Win32Functions \$Win32Functions #\-/g" $mimi
-          mv $mimi .\Invoke-BadThings.ps1
+          mv $mimi ./Invoke-BadThings.ps1
+          ls -la
 
       - name: Store exe in artifact storage
         # if: github.event.inputs.save
@@ -42,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: custom-scripts
-          path: Invoke-BadThings.ps1
+          path: ./Invoke-BadThings.ps1
